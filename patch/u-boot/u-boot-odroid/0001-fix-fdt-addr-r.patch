@@ -1,0 +1,42 @@
+From 4e7401d4a03e1e98d89a7fb3a129ef9b5c3d526e Mon Sep 17 00:00:00 2001
+From: Josef Schlehofer <pepe.schlehofer@gmail.com>
+Date: Sun, 18 Oct 2026 17:35:00 +0200
+Subject: [PATCH] configs: odroid: Move fdt_addr_r to 0x44000000 and resolve RAM collisions
+
+On Samsung Exynos4412 ODROID boards (ODROID-U2, ODROID-U3, ODROID-X2),
+RAM starts at 0x40000000. The default fdt_addr_r was historically set to
+0x40800000 (8 MB into RAM).
+
+Modern Linux kernels (such as 6.12 or 6.18) uncompress to over 10 MB in
+RAM (0x40008000 to ~0x40a00000). During early boot, the ARM kernel
+decompressor inflates the kernel directly over 0x40800000, destroying
+the Device Tree Blob (DTB) before the kernel can parse it. This results
+in an immediate silent system hang at boot.
+
+Furthermore, scriptaddr and ramdisk_addr_r were also colliding with
+kernel_addr_r at 0x42000000. Relocate scriptaddr to 0x43f00000 and
+ramdisk_addr_r to 0x45000000 to ensure all boot artifacts are placed
+in dedicated, non-overlapping RAM regions.
+
+Signed-off-by: Josef Schlehofer <pepe.schlehofer@gmail.com>
+---
+ include/configs/odroid.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/include/configs/odroid.h
++++ b/include/configs/odroid.h
+@@ -139,8 +139,8 @@
+ 	"initrdname=uInitrd\0" \
+-	"ramdisk_addr_r=0x42000000\0" \
+-	"scriptaddr=0x42000000\0" \
+-	"fdt_addr_r=0x40800000\0" \
+-	"kernel_addr_r=0x41000000\0" \
++	"ramdisk_addr_r=0x45000000\0" \
++	"scriptaddr=0x43f00000\0" \
++	"fdt_addr_r=0x44000000\0" \
++	"kernel_addr_r=0x42000000\0" \
+ 	BOOTENV
+ 
+ #endif	/* __CONFIG_H */
+-- 
+2.48.1

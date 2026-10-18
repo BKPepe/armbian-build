@@ -1,0 +1,10 @@
+# Samsung Exynos4412 Prime quad-core 2GB RAM
+BOARD_NAME="Odroid X2"
+BOARD_VENDOR="hardkernel"
+BOARDFAMILY="odroidu2"
+INTRODUCED="2012"
+BOOTCONFIG="odroid_defconfig"
+BOOT_FDT_FILE="samsung/exynos4412-odroidx2.dtb"
+SERIALCON="ttySAC1"
+KERNEL_TARGET="current,edge"
+FULL_DESKTOP="no"
